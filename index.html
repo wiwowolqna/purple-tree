@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>送给小怡</title>
+<style>
+*{margin:0;padding:0}
+body{background:#000;overflow:hidden;height:100vh}
+canvas{display:block}
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<script>
+const canvas=document.getElementById('c');
+const ctx=canvas.getContext('2d');
+function resize(){canvas.width=innerWidth;canvas.height=innerHeight}
+resize();
+window.addEventListener('resize',resize);
+let pts=[];
+let snow=[];
+for(let i=0;i<120;i++){
+  snow.push({
+    x:Math.random()*canvas.width,
+    y:Math.random()*-canvas.height,
+    r:Math.random()*2+1,
+    s:Math.random()*1.2+0.4
+  })
+}
+function tree(x,y,len,ang,dep){
+  if(dep<=0||len<4)return;
+  pts.push({x,y,len,ang});
+  const nx=x+Math.cos(ang)*len;
+  const ny=y+Math.sin(ang)*len;
+  ctx.beginPath();
+  ctx.moveTo(x,y);
+  ctx.lineTo(nx,ny);
+  ctx.strokeStyle='#9932CC';
+  ctx.lineWidth=dep*1.2;
+  ctx.stroke();
+  tree(nx,ny,len*0.72,ang-0.42,dep-1);
+  tree(nx,ny,len*0.72,ang+0.42,dep-1);
+  tree(nx,ny,len*0.52,ang,dep-2);
+}
+function draw(){
+  ctx.fillStyle='rgba(0,0,0,0.07)';
+  ctx.fillRect(0,0,canvas.width,canvas.height);
+  const cx=canvas.width/2;
+  const cy=canvas.height*0.82;
+  tree(cx,cy,95,-Math.PI/2,9);
+  for(let s of snow){
+    ctx.beginPath();
+    ctx.arc(s.x,s.y,s.r,0,Math.PI*2);
+    ctx.fillStyle='#fff';
+    ctx.fill();
+    s.y+=s.s;
+    s.x+=Math.sin(Date.now()/900+s.r)*0.6;
+    if(s.y>canvas.height){
+      s.y=-5;
+      s.x=Math.random()*canvas.width;
+    }
+  }
+  requestAnimationFrame(draw);
+}
+draw();
+</script>
+</body>
+</html>
